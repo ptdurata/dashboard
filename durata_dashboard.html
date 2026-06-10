@@ -243,6 +243,49 @@ body{font-family:var(--sans);font-size:14px;color:var(--t1);background:var(--bg3
     padding-top: 4px;
   }
 }
+
+/* ── TAX ESTIMATOR (p5) ───────────────────────────── */
+#p5{font-family:'Aptos','Aptos Display',system-ui,sans-serif}
+.tax-grid{display:grid;grid-template-columns:1fr 400px;gap:10px;padding-bottom:24px}
+@media(max-width:980px){.tax-grid{grid-template-columns:1fr}}
+.tax-col{display:flex;flex-direction:column;gap:10px}
+.tax-res{position:sticky;top:10px;align-self:start;max-height:calc(100vh - 72px);overflow-y:auto}
+.txrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:0.5px solid var(--bd)}
+.txrow:last-child{border-bottom:none}
+.txrow>label{font-size:12px;color:var(--t2);flex:1}
+.txrow>label .sub{display:block;font-size:10px;color:var(--t3)}
+.txin{width:130px;padding:6px 9px;border:0.5px solid var(--bd2);border-radius:var(--r);font-size:12px;background:var(--bg);color:var(--t1);font-family:var(--mono);text-align:right}
+.txin:focus{outline:none;border-color:var(--green)}
+select.txin{text-align:left;font-family:var(--sans);cursor:pointer}
+.txrow input.txin[type=text]::placeholder{color:var(--t3)}
+.txflags{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px}
+.txchk{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);cursor:pointer}
+.txchk input{accent-color:var(--green)}
+.tx-cards{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.tx-card{background:var(--bg2);border:0.5px solid var(--bd);border-radius:var(--r);padding:9px 11px}
+.tx-card .l{font-size:10px;color:var(--t3);letter-spacing:.3px;text-transform:uppercase;margin-bottom:3px}
+.tx-card .v{font-size:20px;font-weight:600;font-family:var(--mono)}
+.tx-card .s{font-size:10px;color:var(--t3);margin-top:1px}
+.wf{margin-top:2px}
+.wf-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:12px;color:var(--t2);border-bottom:0.5px solid var(--bd)}
+.wf-row .v{font-family:var(--mono);color:var(--t1)}
+.wf-row.major{font-weight:600;font-size:13px;color:var(--t1)}
+.wf-row.major .v{font-weight:600}
+.wf-row.total{font-weight:700;font-size:15px;color:var(--navy);border-top:1.5px solid var(--navy);border-bottom:none;margin-top:3px;padding-top:8px}
+@media(prefers-color-scheme:dark){.wf-row.total{color:#7ecfb3}.wf-row.total{border-top-color:#7ecfb3}}
+.wf-row.total .v{font-weight:700}
+.wf-sub{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);padding:2px 0 2px 14px}
+.wf-sub .v{font-family:var(--mono)}
+.wf-row .neg .v,.wf-row.neg .v{color:var(--red)}
+.bkt{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);margin-top:4px}
+.bkt th{text-align:right;color:var(--t3);font-weight:400;padding:4px 6px;border-bottom:0.5px solid var(--bd);font-size:10px}
+.bkt th:first-child{text-align:left}
+.bkt td{padding:4px 6px;border-bottom:0.5px solid var(--bd);text-align:right}
+.bkt td:first-child{text-align:left}
+.bkt tr:last-child td{border-bottom:none}
+.bkt tr.cur{background:rgba(29,158,117,0.12)}
+.bkt tr.cur td{color:var(--green);font-weight:600}
+.tx-note{font-size:10px;color:var(--t3);line-height:1.6;margin-top:10px;padding-top:8px;border-top:0.5px solid var(--bd)}
 </style>
 </head>
 <body>
@@ -254,7 +297,7 @@ body{font-family:var(--sans);font-size:14px;color:var(--t1);background:var(--bg3
       <button class="nav-tab on" onclick="showPage('p1',this)">📊 Market Overview</button>
       <button class="nav-tab" onclick="showPage('p2',this)">🔍 Company Research</button>
       <button class="nav-tab" onclick="showPage('p3',this)">📈 Bond Valuation</button>
-      <button class="nav-tab" onclick="showPage('p4',this)">📅 Economic Calendar</button>
+      <button class="nav-tab" onclick="showPage('p4',this)">📅 Economic Calendar</button><button class="nav-tab" onclick="showPage('p5',this)">🧮 Tax Estimator</button>
       <span style="font-size:10px;color:rgba(255,255,255,0.3);padding:0 8px;align-self:center" title="Keyboard: 1/2/3/4 = tabs · / = search · Cmd+P = print">⌨ 1-4 · /</span>
     </div>
     <div class="nav-spacer"></div>
@@ -2126,6 +2169,380 @@ function renderCalendar() {
 
   <!-- PAGE 4: ECONOMIC CALENDAR -->
   <div id="p4" class="page" style="padding:12px;overflow-y:auto;height:calc(100vh - 52px)"></div>
+
+  <!-- PAGE 5: TAX ESTIMATOR -->
+  <div id="p5" class="page">
+    <div class="tax-grid">
+
+      <!-- INPUTS -->
+      <div class="tax-col">
+
+        <div class="panel">
+          <div class="ptitle">Filing &amp; Profile</div>
+          <div class="txrow"><label>Tax year</label>
+            <select id="tx_year" class="txin"><option value="2025">2025</option><option value="2026" selected>2026</option></select></div>
+          <div class="txrow"><label>Filing status</label>
+            <select id="tx_status" class="txin">
+              <option value="single">Single</option>
+              <option value="mfj" selected>Married filing jointly</option>
+              <option value="mfs">Married filing separately</option>
+              <option value="hoh">Head of household</option>
+            </select></div>
+          <div class="txrow"><label>State</label>
+            <select id="tx_state" class="txin"></select></div>
+          <div class="txrow"><label>State manual rate <span class="sub">used only when State = Manual rate</span></label>
+            <input id="tx_stateRate" class="txin" type="text" inputmode="decimal" value="5" placeholder="%"></div>
+          <div class="txrow"><label>Qualifying children <span class="sub">under 17 (Child Tax Credit)</span></label>
+            <input id="tx_children" class="txin" type="text" inputmode="numeric" value="2"></div>
+          <div class="txrow"><label>Other dependents <span class="sub">$500 credit each</span></label>
+            <input id="tx_otherdeps" class="txin" type="text" inputmode="numeric" value="0"></div>
+          <div class="txflags">
+            <label class="txchk"><input type="checkbox" id="tx_age65_t"> Taxpayer 65+</label>
+            <label class="txchk"><input type="checkbox" id="tx_blind_t"> Taxpayer blind</label>
+            <label class="txchk"><input type="checkbox" id="tx_age65_s"> Spouse 65+</label>
+            <label class="txchk"><input type="checkbox" id="tx_blind_s"> Spouse blind</label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="ptitle">Income</div>
+          <div class="txrow"><label>Wages &amp; salary <span class="sub">W-2 box 1</span></label><input id="tx_wages" class="txin" type="text" inputmode="decimal" value="180000"></div>
+          <div class="txrow"><label>Taxable interest</label><input id="tx_interest" class="txin" type="text" inputmode="decimal" value="1500"></div>
+          <div class="txrow"><label>Tax-exempt interest <span class="sub">muni — affects SS taxability</span></label><input id="tx_taxexempt" class="txin" type="text" inputmode="decimal" value="0"></div>
+          <div class="txrow"><label>Ordinary dividends <span class="sub">total, incl. qualified</span></label><input id="tx_orddiv" class="txin" type="text" inputmode="decimal" value="8000"></div>
+          <div class="txrow"><label>Qualified dividends <span class="sub">of which (LTCG rates)</span></label><input id="tx_qualdiv" class="txin" type="text" inputmode="decimal" value="6000"></div>
+          <div class="txrow"><label>IRA / pension / annuity <span class="sub">taxable amount</span></label><input id="tx_irapension" class="txin" type="text" inputmode="decimal" value="0"></div>
+          <div class="txrow"><label>Social Security benefits <span class="sub">gross — taxable portion auto</span></label><input id="tx_ss" class="txin" type="text" inputmode="decimal" value="0"></div>
+          <div class="txrow"><label>Short-term capital gain <span class="sub">net; taxed as ordinary</span></label><input id="tx_stgain" class="txin" type="text" inputmode="decimal" value="0"></div>
+          <div class="txrow"><label>Long-term capital gain <span class="sub">net; preferential rates</span></label><input id="tx_ltgain" class="txin" type="text" inputmode="decimal" value="25000"></div>
+          <div class="txrow"><label>Business income <span class="sub">net Schedule C — drives SE tax</span></label><input id="tx_schedc" class="txin" type="text" inputmode="decimal" value="0"></div>
+          <div class="txrow"><label>Other income</label><input id="tx_other" class="txin" type="text" inputmode="decimal" value="0"></div>
+        </div>
+
+        <div class="panel">
+          <div class="ptitle">Adjustments &amp; Deductions</div>
+          <div class="txrow"><label>Above-the-line adjustments <span class="sub">HSA, IRA, SE health, etc. (½ SE tax added automatically)</span></label><input id="tx_adjust" class="txin" type="text" inputmode="decimal" value="0"></div>
+          <div class="txrow"><label>Itemized deductions <span class="sub">total — std deduction used if larger</span></label><input id="tx_itemized" class="txin" type="text" inputmode="decimal" value="0"></div>
+          <div class="txrow"><label>Qualified business income (QBI) <span class="sub">for 20% §199A deduction</span></label><input id="tx_qbi" class="txin" type="text" inputmode="decimal" value="0"></div>
+        </div>
+
+        <div class="panel">
+          <div class="ptitle">Credits &amp; Payments</div>
+          <div class="txrow"><label>Other tax credits</label><input id="tx_credits" class="txin" type="text" inputmode="decimal" value="0"></div>
+          <div class="txrow"><label>Federal withholding</label><input id="tx_withholding" class="txin" type="text" inputmode="decimal" value="34000"></div>
+          <div class="txrow"><label>Estimated payments</label><input id="tx_estpay" class="txin" type="text" inputmode="decimal" value="0"></div>
+        </div>
+
+      </div>
+
+      <!-- RESULTS -->
+      <div class="tax-res">
+        <div class="panel">
+          <div class="ptitle">Summary <span class="pts" id="tx_yearlbl"></span></div>
+          <div class="tx-cards" id="tx_cards"></div>
+          <div class="wf" id="tx_wf"></div>
+          <div class="ptitle" style="margin-top:16px">Federal Ordinary Brackets</div>
+          <table class="bkt" id="tx_bkt"></table>
+          <div class="tx-note" id="tx_note"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   DURATA — 1040 TAX ESTIMATOR  (single-scenario engine, v1)
+   Self-contained. computeTax(inputs) is a pure function so scenario
+   comparison later = call it twice. Verify all constants before relying
+   on output for client work — bracket/threshold figures change yearly.
+   ════════════════════════════════════════════════════════════════════ */
+(function(){
+  "use strict";
+
+  /* ── Federal constants by tax year ──────────────────────────────── */
+  const TAX = {
+    2025: {
+      std:    {single:15750, mfj:31500, mfs:15750, hoh:23625},
+      addStd: {single:2000,  mfj:1600,  mfs:1600,  hoh:2000},   // per 65+/blind box
+      brackets:{
+        single:[[0,.10],[11925,.12],[48475,.22],[103350,.24],[197300,.32],[250525,.35],[626350,.37]],
+        mfj:   [[0,.10],[23850,.12],[96950,.22],[206700,.24],[394600,.32],[501050,.35],[751600,.37]],
+        mfs:   [[0,.10],[11925,.12],[48475,.22],[103350,.24],[197300,.32],[250525,.35],[375800,.37]],
+        hoh:   [[0,.10],[17000,.12],[64850,.22],[103350,.24],[197300,.32],[250500,.35],[626350,.37]]
+      },
+      ltcg:  {single:[48350,533400], mfj:[96700,600050], mfs:[48350,300000], hoh:[64750,566700]},
+      niit:  {single:200000, mfj:250000, mfs:125000, hoh:200000},
+      ssWageBase:176100, ctcPhaseout:{single:200000, mfj:400000, mfs:200000, hoh:200000}
+    },
+    2026: {
+      std:    {single:16100, mfj:32200, mfs:16100, hoh:24150},
+      addStd: {single:2050,  mfj:1650,  mfs:1650,  hoh:2050},
+      brackets:{
+        single:[[0,.10],[12400,.12],[50400,.22],[105700,.24],[201775,.32],[256225,.35],[640600,.37]],
+        mfj:   [[0,.10],[24800,.12],[100800,.22],[211400,.24],[403550,.32],[512450,.35],[768700,.37]],
+        mfs:   [[0,.10],[12400,.12],[50400,.22],[105700,.24],[201775,.32],[256225,.35],[384350,.37]],
+        hoh:   [[0,.10],[17700,.12],[67450,.22],[105700,.24],[201775,.32],[256200,.35],[640600,.37]]
+      },
+      ltcg:  {single:[49450,545500], mfj:[98900,613700], mfs:[49450,306850], hoh:[66200,579600]},
+      niit:  {single:200000, mfj:250000, mfs:125000, hoh:200000},
+      ssWageBase:184500, ctcPhaseout:{single:200000, mfj:400000, mfs:200000, hoh:200000}
+    }
+  };
+
+  /* ── State tax (approximate — manual override always available) ──── */
+  const NO_TAX = ['AK','FL','NV','NH','SD','TN','TX','WA','WY'];
+  const FLAT = {AZ:.025,CO:.044,GA:.0539,ID:.05695,IL:.0495,IN:.0305,IA:.038,KY:.04,MA:.05,MI:.0425,MS:.044,NC:.0425,PA:.0307,UT:.0455};
+  const STATE_BR = {
+    CA:{std:{single:5540,mfj:11080,mfs:5540,hoh:11080},
+        br:{single:[[0,.01],[10756,.02],[25499,.04],[40245,.06],[55866,.08],[70606,.093],[360659,.103],[432787,.113],[721314,.123],[1000000,.133]],
+            mfj:[[0,.01],[21512,.02],[50998,.04],[80490,.06],[111732,.08],[141212,.093],[721318,.103],[865574,.113],[1442628,.123],[1000000,.133]]}},
+    NY:{std:{single:8000,mfj:16050,mfs:8000,hoh:11200},
+        br:{single:[[0,.04],[8500,.045],[11700,.0525],[13900,.055],[80650,.06],[215400,.0685],[1077550,.0965],[5000000,.103],[25000000,.109]],
+            mfj:[[0,.04],[17150,.045],[23600,.0525],[27900,.055],[161550,.06],[323200,.0685],[2155350,.0965],[5000000,.103],[25000000,.109]]}},
+    NJ:{std:{single:0,mfj:0,mfs:0,hoh:0},
+        br:{single:[[0,.014],[20000,.0175],[35000,.035],[40000,.05525],[75000,.0637],[500000,.0897],[1000000,.1075]],
+            mfj:[[0,.014],[20000,.0175],[50000,.0245],[70000,.035],[80000,.05525],[150000,.0637],[500000,.0897],[1000000,.1075]]}}
+  };
+
+  /* ── Helpers ─────────────────────────────────────────────────────── */
+  const el  = id => document.getElementById(id);
+  const num = id => { const v = parseFloat((el(id).value||'').replace(/[^0-9.\-]/g,'')); return isFinite(v)?v:0; };
+  const chk = id => el(id).checked;
+  const fmt = n => (n<0?'-':'') + '$' + Math.round(Math.abs(n)).toLocaleString('en-US');
+  const pct = r => (r*100).toFixed(1) + '%';
+  const stBase = fs => (fs==='mfj'||fs==='hoh') ? fs : 'single'; // state tables only single/mfj
+
+  function bracketTax(ti, br){
+    let t = 0;
+    for(let i=0;i<br.length;i++){
+      const lo = br[i][0], hi = (i+1<br.length)?br[i+1][0]:Infinity;
+      if(ti<=lo) break;
+      t += (Math.min(ti,hi)-lo) * br[i][1];
+    }
+    return t;
+  }
+  function marginal(ti, br){
+    let r = br[0][1];
+    for(let i=0;i<br.length;i++) if(ti>br[i][0]) r = br[i][1];
+    return r;
+  }
+
+  // Social Security taxability worksheet (simplified; MFS-living-together not modeled)
+  function taxableSS(ss, otherInclSS_AGI, taxExempt, fs){
+    if(ss<=0) return 0;
+    const prov = otherInclSS_AGI + taxExempt + 0.5*ss;
+    const b1 = (fs==='mfj')?32000:25000, b2 = (fs==='mfj')?44000:34000;
+    if(prov<=b1) return 0;
+    let t;
+    if(prov<=b2) t = Math.min(0.5*ss, 0.5*(prov-b1));
+    else t = Math.min(0.85*ss, 0.85*(prov-b2) + Math.min(0.5*ss, 0.5*(b2-b1)));
+    return Math.min(t, 0.85*ss);
+  }
+
+  function stateTax(code, fs, agi){
+    if(code==='none' || NO_TAX.includes(code)) return {tax:0, label:'None'};
+    if(code==='manual'){ const r = num('tx_stateRate')/100; return {tax: Math.max(0,agi)*r, label:'Manual '+pct(r)}; }
+    if(FLAT[code]!==undefined){ return {tax: Math.max(0,agi)*FLAT[code], label:'Flat '+pct(FLAT[code])}; }
+    const s = STATE_BR[code];
+    if(s){ const k = stBase(fs); const base = Math.max(0, agi - s.std[k]); return {tax: bracketTax(base, s.br[k]||s.br.single), label:'Graduated'}; }
+    return {tax:0, label:'None'};
+  }
+
+  /* ── Core engine ─────────────────────────────────────────────────── */
+  function computeTax(inp){
+    const T = TAX[inp.year], fs = inp.status, br = T.brackets[fs];
+
+    // Self-employment tax
+    const netSE = Math.max(0, inp.schedc) * 0.9235;
+    let seTax = 0;
+    if(netSE > 0){
+      const ssRoom = Math.max(0, T.ssWageBase - Math.min(inp.wages, T.ssWageBase));
+      seTax = Math.min(netSE, ssRoom)*0.124 + netSE*0.029;
+    }
+    const halfSE = seTax/2;
+
+    // Capital-gain netting
+    const combined = inp.stgain + inp.ltgain;
+    let capAGI, prefGain;
+    if(combined <= 0){ capAGI = Math.max(combined, -3000); prefGain = 0; }
+    else { capAGI = combined; prefGain = Math.max(0, Math.min(inp.ltgain, combined)); }
+    const prefIncome = prefGain + inp.qualdiv;  // taxed at LTCG/QD rates
+
+    // Adjustments & AGI
+    const adjustments = inp.adjust + halfSE;
+    const ordExclSS = inp.wages + inp.interest + inp.orddiv + inp.irapension + capAGI + inp.schedc + inp.other - adjustments;
+    const taxSS = taxableSS(inp.ss, ordExclSS, inp.taxexempt, fs);
+    const totalIncome = inp.wages + inp.interest + inp.orddiv + inp.irapension + taxSS + capAGI + inp.schedc + inp.other;
+    const agi = totalIncome - adjustments;
+
+    // Deduction (std vs itemized)
+    let boxes = (inp.age65_t?1:0) + (inp.blind_t?1:0);
+    if(fs==='mfj') boxes += (inp.age65_s?1:0) + (inp.blind_s?1:0);
+    const stdDed = T.std[fs] + boxes*T.addStd[fs];
+    const useItem = inp.itemized > stdDed;
+    const deduction = Math.max(stdDed, inp.itemized);
+
+    // QBI (simplified 20%, no W-2/SSTB limits)
+    const tiPreQBI = Math.max(0, agi - deduction);
+    const qbiDed = Math.min(0.20*Math.max(0,inp.qbi), 0.20*Math.max(0, tiPreQBI - prefIncome));
+
+    // Taxable income split
+    const taxable = Math.max(0, agi - deduction - qbiDed);
+    const prefTax = Math.min(prefIncome, taxable);
+    const ordTax  = taxable - prefTax;
+
+    // Ordinary tax
+    const ordinaryTax = bracketTax(ordTax, br);
+
+    // LTCG / QD tax (stacked above ordinary income)
+    const th = T.ltcg[fs], th0 = th[0], th15 = th[1];
+    const amt0  = Math.max(0, Math.min(taxable, th0) - ordTax);
+    const amt15 = Math.max(0, Math.min(taxable, th15) - Math.max(ordTax, th0));
+    const amt20 = Math.max(0, prefTax - amt0 - amt15);
+    const prefTaxDue = amt15*0.15 + amt20*0.20;
+
+    const taxBeforeCredits = ordinaryTax + prefTaxDue;
+
+    // Credits — Child Tax Credit w/ phase-out + other dependent credit
+    let ctc = inp.children*2000 + inp.otherdeps*500;
+    const over = Math.max(0, agi - T.ctcPhaseout[fs]);
+    ctc = Math.max(0, ctc - Math.ceil(over/1000)*50);
+    const credits = ctc + inp.credits;
+    const taxAfterCredits = Math.max(0, taxBeforeCredits - credits);
+
+    // Other taxes
+    const nii  = Math.max(0, inp.interest + inp.orddiv + Math.max(0, capAGI));
+    const niit = 0.038 * Math.min(nii, Math.max(0, agi - T.niit[fs]));
+    const addlMed = 0.009 * Math.max(0, (inp.wages + Math.max(0,netSE)) - T.niit[fs]);
+
+    const totalFed = taxAfterCredits + seTax + niit + addlMed;
+
+    // State
+    const st = stateTax(inp.state, fs, agi);
+
+    const totalTax = totalFed + st.tax;
+    const payments = inp.withholding + inp.estpay;
+
+    return {
+      totalIncome, adjustments, halfSE, agi, deduction, stdDed, useItem, qbiDed,
+      taxable, ordTax, prefTax, ordinaryTax, prefTaxDue, taxBeforeCredits, credits, ctc,
+      taxAfterCredits, seTax, niit, addlMed, totalFed, stateTax:st.tax, stateLabel:st.label,
+      totalTax, payments, fedBalance: payments - totalFed,
+      effRate: totalIncome>0 ? totalTax/totalIncome : 0,
+      margRate: marginal(ordTax, br), taxSS, prefIncome, br, ordBreak: bracketBreakdown(ordTax, br)
+    };
+  }
+
+  function bracketBreakdown(ti, br){
+    const rows = [];
+    for(let i=0;i<br.length;i++){
+      const lo = br[i][0], hi = (i+1<br.length)?br[i+1][0]:Infinity, rate = br[i][1];
+      const amt = Math.max(0, Math.min(ti,hi)-lo);
+      const cur = ti>lo && ti<=hi || (hi===Infinity && ti>lo);
+      rows.push({lo, hi, rate, amt, tax:amt*rate, cur});
+    }
+    return rows;
+  }
+
+  /* ── Read inputs ─────────────────────────────────────────────────── */
+  function readInputs(){
+    return {
+      year: parseInt(el('tx_year').value,10), status: el('tx_status').value, state: el('tx_state').value,
+      children:num('tx_children'), otherdeps:num('tx_otherdeps'),
+      age65_t:chk('tx_age65_t'), blind_t:chk('tx_blind_t'), age65_s:chk('tx_age65_s'), blind_s:chk('tx_blind_s'),
+      wages:num('tx_wages'), interest:num('tx_interest'), taxexempt:num('tx_taxexempt'),
+      orddiv:num('tx_orddiv'), qualdiv:num('tx_qualdiv'), irapension:num('tx_irapension'), ss:num('tx_ss'),
+      stgain:num('tx_stgain'), ltgain:num('tx_ltgain'), schedc:num('tx_schedc'), other:num('tx_other'),
+      adjust:num('tx_adjust'), itemized:num('tx_itemized'), qbi:num('tx_qbi'),
+      credits:num('tx_credits'), withholding:num('tx_withholding'), estpay:num('tx_estpay')
+    };
+  }
+
+  /* ── Render ──────────────────────────────────────────────────────── */
+  function render(){
+    const inp = readInputs(), r = computeTax(inp);
+    el('tx_yearlbl').textContent = inp.year + ' · ' + ({single:'Single',mfj:'MFJ',mfs:'MFS',hoh:'HoH'}[inp.status]);
+
+    const owe = r.fedBalance >= 0;
+    el('tx_cards').innerHTML =
+      card('Total Federal Tax', fmt(r.totalFed), 'before state') +
+      card('Total Tax', fmt(r.totalTax), 'fed + state') +
+      card('Effective Rate', pct(r.effRate), 'of total income') +
+      card('Marginal Rate', pct(r.margRate), 'federal ordinary') +
+      `<div class="tx-card" style="grid-column:1/-1">
+         <div class="l">Federal ${owe?'Refund':'Balance Due'}</div>
+         <div class="v ${owe?'pos':'neg'}">${fmt(Math.abs(r.fedBalance))}</div>
+         <div class="s">withholding + payments ${fmt(r.payments)} − tax ${fmt(r.totalFed)}</div>
+       </div>`;
+
+    const W = (l,v,cls='') => `<div class="wf-row ${cls}"><span>${l}</span><span class="v">${v}</span></div>`;
+    const S = (l,v) => `<div class="wf-sub"><span>${l}</span><span class="v">${v}</span></div>`;
+    el('tx_wf').innerHTML =
+      W('Total income', fmt(r.totalIncome)) +
+      (r.taxSS>0 ? S('incl. taxable Social Security', fmt(r.taxSS)) : '') +
+      W('Adjustments', '−'+fmt(r.adjustments)) +
+      (r.halfSE>0 ? S('½ self-employment tax', fmt(r.halfSE)) : '') +
+      W('Adjusted gross income', fmt(r.agi), 'major') +
+      W((r.useItem?'Itemized':'Standard')+' deduction', '−'+fmt(r.deduction)) +
+      (r.qbiDed>0 ? W('QBI deduction (§199A)', '−'+fmt(r.qbiDed)) : '') +
+      W('Taxable income', fmt(r.taxable), 'major') +
+      S('ordinary-rate portion', fmt(r.ordTax)) +
+      S('preferential-rate portion', fmt(r.prefTax)) +
+      W('Tax on ordinary income', fmt(r.ordinaryTax)) +
+      W('Tax on LTCG / qualified div', fmt(r.prefTaxDue)) +
+      W('Tax before credits', fmt(r.taxBeforeCredits), 'major') +
+      W('Credits'+(r.ctc>0?' (incl. CTC '+fmt(r.ctc)+')':''), '−'+fmt(r.credits)) +
+      W('Income tax after credits', fmt(r.taxAfterCredits), 'major') +
+      (r.seTax>0   ? W('Self-employment tax', '+'+fmt(r.seTax)) : '') +
+      (r.niit>0    ? W('Net investment income tax (3.8%)', '+'+fmt(r.niit)) : '') +
+      (r.addlMed>0 ? W('Additional Medicare tax (0.9%)', '+'+fmt(r.addlMed)) : '') +
+      W('Total federal tax', fmt(r.totalFed), 'major') +
+      W('State tax'+(r.stateLabel!=='None'?' ('+r.stateLabel+')':''), '+'+fmt(r.stateTax)) +
+      W('Total tax liability', fmt(r.totalTax), 'total');
+
+    el('tx_bkt').innerHTML =
+      '<tr><th>Rate</th><th>Bracket</th><th>Income</th><th>Tax</th></tr>' +
+      r.ordBreak.map(b => {
+        if(b.amt<=0 && !b.cur) return '';
+        const hi = b.hi===Infinity ? '+' : fmt(b.hi);
+        return `<tr class="${b.cur?'cur':''}"><td>${pct(b.rate)}</td><td>${fmt(b.lo)} – ${hi}</td><td>${fmt(b.amt)}</td><td>${fmt(b.tax)}</td></tr>`;
+      }).join('');
+
+    el('tx_note').innerHTML =
+      'Estimate only — not tax advice. Federal figures per IRS inflation-adjusted brackets; ' +
+      'state tax is approximate (use Manual rate for precision). Simplifications: QBI uses 20% without ' +
+      'W-2/SSTB limits; AMT, SALT cap nuances, and credit phase-outs beyond CTC are not modeled.';
+  }
+  function card(l,v,s){ return `<div class="tx-card"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`; }
+
+  /* ── Init ────────────────────────────────────────────────────────── */
+  function buildStateOptions(){
+    const sel = el('tx_state');
+    const names = {AK:'Alaska',FL:'Florida',NV:'Nevada',NH:'New Hampshire',SD:'South Dakota',TN:'Tennessee',TX:'Texas',WA:'Washington',WY:'Wyoming',
+      AZ:'Arizona',CO:'Colorado',GA:'Georgia',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KY:'Kentucky',MA:'Massachusetts',MI:'Michigan',MS:'Mississippi',NC:'North Carolina',PA:'Pennsylvania',UT:'Utah',
+      CA:'California',NY:'New York',NJ:'New Jersey'};
+    const groups = [
+      ['Graduated', ['CA','NY','NJ']],
+      ['Flat rate', Object.keys(FLAT).sort()],
+      ['No income tax', NO_TAX]
+    ];
+    let html = '<option value="none">No state / Other</option><option value="manual">Manual effective rate</option>';
+    for(const [g,codes] of groups){
+      html += `<optgroup label="${g}">`;
+      for(const c of codes) html += `<option value="${c}">${names[c]||c}</option>`;
+      html += '</optgroup>';
+    }
+    sel.innerHTML = html;
+    sel.value = 'CA';
+  }
+
+  buildStateOptions();
+  el('p5').addEventListener('input', render);
+  el('p5').addEventListener('change', render);
+  render();
+})();
+</script>
 
 </body>
 </html>

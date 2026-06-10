@@ -305,9 +305,8 @@ select.txin{text-align:left;font-family:var(--sans);cursor:pointer}
       <div class="status-dot" id="dot"></div>
       <span class="status-lbl" id="lbl">loading…</span>
     </div>
-    <span class="nav-klbl">FINNHUB (research only):</span>
     <span id="finnLimitBadge" style="display:none;background:#E24B4A;color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;margin-left:-4px;margin-right:4px">LIMIT REACHED</span>
-    <input class="nav-key" id="finnK" placeholder="Finnhub key for company research…" value="d7judg9r01qnk4octu10d7judg9r01qnk4octu1g"/>
+    <input type="hidden" id="finnK" placeholder="Finnhub key for company research…" value="d7judg9r01qnk4octu10d7judg9r01qnk4octu1g"/>
   </nav>
 
   <!-- PAGE 1: MARKET OVERVIEW -->
@@ -1887,6 +1886,7 @@ document.addEventListener('keydown', e => {
   if(e.key==='2') document.querySelector('.nav-tab:nth-child(2)').click();
   if(e.key==='3') document.querySelector('.nav-tab:nth-child(3)').click();
   if(e.key==='4') document.querySelector('.nav-tab:nth-child(4)').click();
+  if(e.key==='5') document.querySelector('.nav-tab:nth-child(5)').click();
   if(e.key==='/') { e.preventDefault(); const s=$('sym'); if(s){showPage('p2',document.querySelector('.nav-tab:nth-child(2)'));s.focus();s.select();} }
   if(e.key==='p'&&(e.metaKey||e.ctrlKey)) { e.preventDefault(); printResearch(); }
 });
